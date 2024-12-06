@@ -1,379 +1,112 @@
-body {
-    margin: 0;
-    font-family: 'Roboto', sans-serif;
-    background: #f5f5f5;
-    color: #333;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #0d6efd;
-    color: #fff;
-    padding: 10px 20px;
-}
+    <title>Key Audit System</title>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
 
-.navbar-left h1, .navbar-left h2, .navbar-left h3 {
-    margin: 0 10px 0 0;
-    display: inline-block;
-}
+    <!-- jsPDF and jsPDF-AutoTable (CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <!-- Guard Name Modal -->
+    <div class="modal-overlay" id="nameModal">
+        <div class="modal-content">
+            <h2>Enter Guard Name</h2>
+            <input type="text" id="guardNameInput" placeholder="Guard Name..." />
+            <button id="saveGuardNameBtn">Save</button>
+        </div>
+    </div>
 
-.navbar-left h1 {
-    font-size: 1.4rem;
-    font-weight: 500;
-}
+    <!-- Reset Confirmation Modal -->
+    <div class="modal-overlay" id="resetModal">
+        <div class="modal-content">
+            <h2>Confirm Reset</h2>
+            <p>This will clear all saved data. Continue?</p>
+            <div class="modal-actions">
+                <button id="confirmResetBtn" class="danger">Yes</button>
+                <button id="cancelResetBtn">No</button>
+            </div>
+        </div>
+    </div>
 
-.navbar-left h2 {
-    font-size: 1.2rem;
-    font-weight: 400;
-    margin: 0 10px;
-}
+    <!-- Help Modal -->
+    <div class="modal-overlay" id="helpModal">
+        <div class="modal-content help-content">
+            <h2>Help</h2>
+            <ol>
+                <li>Enter your name when prompted on first visit.</li>
+                <li>Use the search bar at the top to filter keys by tags or sets.</li>
+                <li>Click on Good, Missing, Damaged, or Other to set the status of each key.</li>
+                <li>If Other is selected, a notes textarea will appear below that key.</li>
+                <li>Watch the progress bar as you complete the audit.</li>
+                <li>Use "Generate PDF Report" to download a full audit summary.</li>
+                <li>Click "Reset Audit" to clear all data if needed.</li>
+            </ol>
+            <button id="closeHelpBtn">Close</button>
+        </div>
+    </div>
 
-.navbar-left h3 {
-    font-size: 1rem;
-    font-weight: 300;
-}
+    <header class="navbar">
+        <div class="navbar-left">
+            <span class="tooltip" data-tooltip="Building Name">
+                <h1 id="buildingName">The Gloucester on Yonge</h1>
+            </span>
+            <span class="tooltip" data-tooltip="Guard Name">
+                <h2 id="guardNameDisplay"></h2>
+            </span>
+            <span class="tooltip" data-tooltip="Date/Time">
+                <h3 id="currentDateTime"></h3>
+            </span>
+        </div>
+        <div class="navbar-right">
+            <input type="text" id="searchInput" placeholder="Search keys by key tag or individual keysets...">
+            <button id="helpBtn">Help</button>
+            <button id="resetBtn">Reset Audit</button>
+        </div>
+    </header>
 
-.navbar-right {
-    display: flex;
-    align-items: center;
-}
+    <main>
+        <div class="stats-container">
+            <div class="progress-section">
+                <div class="progress-bar-text">
+                    <span id="progressPercentage">0%</span>
+                </div>
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-bar-fill" id="progressFill"></div>
+                </div>
+            </div>
+            <div class="pill-container">
+                <div class="pill good-pill">
+                    <i class="fas fa-check-circle"></i> Good: <span id="goodCount">0</span>
+                </div>
+                <div class="pill missing-pill">
+                    <i class="fas fa-times-circle"></i> Missing: <span id="missingCount">0</span>
+                </div>
+                <div class="pill damaged-pill">
+                    <i class="fas fa-exclamation-triangle"></i> Damaged: <span id="damagedCount">0</span>
+                </div>
+                <div class="pill other-pill">
+                    <i class="fas fa-question-circle"></i> Other: <span id="otherCount">0</span>
+                </div>
+            </div>
+            <button id="generatePDFBtn" class="pdf-btn">Generate PDF Report</button>
+        </div>
 
-.navbar-right input[type="text"] {
-    padding: 5px 10px;
-    margin-right: 10px;
-    border-radius: 20px;
-    border: 1px solid #ccc;
-    outline: none;
-    font-size: 1rem;
-}
+        <div class="key-set-container" id="keySetsContainer">
+            <!-- Key sets generated by JS -->
+        </div>
+    </main>
 
-.navbar-right button {
-    background: #fff;
-    color: #0d6efd;
-    border: none;
-    padding: 5px 15px;
-    margin-left: 10px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background 0.3s;
-}
+    <footer class="footer">
+        <span>© 2023 Key Audit System</span>
+    </footer>
 
-.navbar-right button:hover {
-    background: #e1e1e1;
-}
-
-/* Tooltips */
-.tooltip {
-    position: relative;
-}
-
-.tooltip[data-tooltip]:hover::before {
-    content: attr(data-tooltip);
-    position: absolute;
-    top: -30px;
-    left: 0;
-    background: #333;
-    color: #fff;
-    padding: 5px 8px;
-    font-size: 0.8rem;
-    border-radius: 4px;
-    white-space: nowrap;
-    pointer-events: none;
-    opacity: 0.9;
-}
-
-.tooltip[data-tooltip]:hover::after {
-    content: "";
-    position: absolute;
-    top: -10px;
-    left: 10px;
-    border: 5px solid transparent;
-    border-bottom-color: #333;
-    pointer-events: none;
-}
-
-/* Stats and Progress */
-.stats-container {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    background: #fff;
-    padding: 20px;
-    border-bottom: 1px solid #ddd;
-    gap: 20px;
-}
-
-.progress-section {
-    display: flex;
-    flex-direction: column;
-    min-width: 200px;
-}
-
-.progress-bar {
-    background: #e9ecef;
-    border-radius: 10px;
-    overflow: hidden;
-    height: 20px;
-    width: 100%;
-    margin-top: 5px;
-}
-
-.progress-bar-fill {
-    background: #0d6efd;
-    height: 100%;
-    width: 0%;
-    transition: width 0.3s;
-}
-
-.progress-bar-text {
-    font-size: 1rem;
-    margin-bottom: 5px;
-    text-align: left;
-}
-
-.pill-container {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-}
-
-.pill {
-    display: inline-flex;
-    align-items: center;
-    border-radius: 50px;
-    padding: 5px 10px;
-    font-size: 0.9rem;
-    color: #fff;
-    gap: 5px;
-    white-space: nowrap;
-}
-
-.good-pill {
-    background: #28a745;
-}
-
-.missing-pill {
-    background: #dc3545;
-}
-
-.damaged-pill {
-    background: #fd7e14;
-}
-
-.other-pill {
-    background: #6c757d;
-}
-
-.pdf-btn {
-    background: #0d6efd;
-    color: #fff;
-    border-radius: 20px;
-    border: none;
-    padding: 5px 15px;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-.pdf-btn:hover {
-    background: #094caf;
-}
-
-/* Key Sets and Table */
-.key-set-container {
-    padding: 20px;
-}
-
-.key-set {
-    background: #fff;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid #ddd;
-}
-
-.key-set-header {
-    background: #f1f1f1;
-    padding: 10px;
-    font-weight: 500;
-    text-align: left;
-}
-
-.key-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.key-table thead {
-    background: #f9f9f9;
-}
-
-.key-table th, .key-table td {
-    border-bottom: 1px solid #ddd;
-    padding: 10px;
-    vertical-align: middle;
-    font-size: 0.9rem;
-    text-align: center;
-    white-space: nowrap;
-}
-
-.key-table td:first-child {
-    text-align: left;
-    white-space: normal;
-}
-
-.status-buttons {
-    display: flex;
-    gap: 5px;
-    justify-content: center;
-    align-items: center;
-}
-
-.status-btn {
-    border: none;
-    padding: 5px 10px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    text-align: center;
-    min-width: 60px;
-}
-
-.status-btn.good {
-    background: #28a745;
-    color: #fff;
-}
-
-.status-btn.missing {
-    background: #dc3545;
-    color: #fff;
-}
-
-.status-btn.damaged {
-    background: #fd7e14;
-    color: #fff;
-}
-
-.status-btn.other {
-    background: #6c757d;
-    color: #fff;
-}
-
-.notes-textarea {
-    width: 90%;
-    margin: 10px auto;
-    padding: 5px;
-    resize: vertical;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    display: block;
-}
-
-/* Row background colors */
-.key-row.good-selected {
-    background: #e3fced;
-}
-
-.key-row.missing-selected {
-    background: #fce3e3;
-}
-
-.key-row.damaged-selected {
-    background: #fcefe3;
-}
-
-.key-row.other-selected {
-    background: #e3e3e3;
-}
-
-/* Footer */
-.footer {
-    text-align: center;
-    padding: 20px;
-    font-size: 0.8rem;
-    background: #fff;
-    border-top: 1px solid #ddd;
-}
-
-/* Modals */
-.modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0; 
-    left: 0;
-    width: 100%; 
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background: #fff;
-    border-radius: 8px;
-    padding: 20px;
-    max-width: 400px;
-    width: 90%;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-
-.modal-actions button {
-    padding: 5px 15px;
-    border-radius: 20px;
-    border: none;
-    cursor: pointer;
-    font-size: 0.9rem;
-    background: #0d6efd;
-    color: #fff;
-}
-
-.modal-actions button.danger {
-    background: #dc3545;
-}
-
-.modal-content h2 {
-    margin: 0 0 10px;
-}
-
-.modal-content input, .modal-content textarea {
-    width: 100%;
-    padding: 5px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-}
-
-.help-content ol {
-    padding-left: 20px;
-    margin: 0;
-}
-
-.help-content ol li {
-    margin-bottom: 10px;
-}
-
-#saveGuardNameBtn, #closeHelpBtn {
-    background: #0d6efd;
-    color: #fff;
-    border-radius: 20px;
-    border: none;
-    padding: 5px 15px;
-    cursor: pointer;
-    align-self: flex-end;
-}
+    <script src="js/scripts.js"></script>
+</body>
+</html>
