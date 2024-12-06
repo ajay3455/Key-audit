@@ -1,692 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <!-- Title and Icons -->
     <title>Key Audit System</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <!-- jsPDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.0/jspdf.umd.min.js"></script>
-    <!-- jsPDF-AutoTable -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.24/jspdf.plugin.autotable.min.js"></script>
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
+    <link rel="stylesheet" href="css/style.css"/>
 
-        .navbar {
-            background-color: #007bff;
-        }
+    <!-- External Fonts and Icons (Optional) -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
 
-        .navbar-brand,
-        .navbar-nav .nav-link {
-            color: #ffffff !important;
-        }
+    <!-- jsPDF and jsPDF-AutoTable (CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
-        .container {
-            margin-top: 90px;
-            margin-bottom: 100px;
-        }
-
-        #progress-bar {
-            height: 20px;
-        }
-
-        .progress {
-            margin-bottom: 20px;
-        }
-
-        .table tbody td {
-            vertical-align: middle;
-        }
-
-        .footer {
-            background-color: #007bff;
-            color: #ffffff;
-            padding: 10px 0;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
-
-        .modal-header {
-            background-color: #007bff;
-            color: #fff;
-        }
-
-        /* Row Colors */
-        .table-success {
-            background-color: #e6ffe6 !important;
-        }
-
-        .table-danger {
-            background-color: #ffe6e6 !important;
-        }
-
-        .table-warning {
-            background-color: #fff5e6 !important;
-        }
-
-        .table-info {
-            background-color: #e6e6ff !important;
-        }
-
-        .table-unchecked {
-            background-color: #ececec !important;
-        }
-
-        /* Status Buttons */
-        .status-btn {
-            margin-right: 5px;
-            border-radius: 30px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .status-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Dashboard as pills */
-        .dashboard-container {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .dashboard-pill {
-            display: inline-flex;
-            align-items: center;
-            padding: 12px 25px;
-            border-radius: 50px;
-            font-weight: bold;
-            color: #fff;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .dashboard-pill:hover {
-            transform: translateY(-3px);
-            box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        .dashboard-good {
-            background-color: #28a745;
-        }
-
-        .dashboard-missing {
-            background-color: #dc3545;
-        }
-
-        .dashboard-damaged {
-            background-color: #fd7e14;
-        }
-
-        .dashboard-other {
-            background-color: #6c757d;
-        }
-
-        .note-field {
-            margin-top: 10px;
-            display: none;
-        }
-
-        .reset-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Search Bar Styling */
-        #search-bar {
-            width: 100%;
-            max-width: 600px;
-            margin: 20px auto;
-            border-radius: 30px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            padding: 10px;
-        }
-
-        #search-bar:focus {
-            transform: translateY(-3px);
-            box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15);
-            outline: none;
-        }
-    </style>
 </head>
-
 <body>
-
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Key Audit System</a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item" data-bs-toggle="tooltip" title="Building Name">
-                        <span class="nav-link" id="building-name-display">The Gloucester on Yonge</span>
-                    </li>
-                    <li class="nav-item" data-bs-toggle="tooltip" title="Guard Name">
-                        <span class="nav-link" id="guard-name-display">Guard Name</span>
-                    </li>
-                    <li class="nav-item" data-bs-toggle="tooltip" title="Current Date/Time">
-                        <span class="nav-link" id="audit-date"></span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
     <!-- Guard Name Modal -->
-    <div class="modal fade" id="guardNameModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Enter Guard's Name</h5>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="guard-name-input" class="form-label">Guard's Name</label>
-                        <input type="text" class="form-control" id="guard-name-input" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" onclick="saveGuardName()" class="btn btn-primary">Start Audit</button>
-                </div>
-            </div>
+    <div class="modal-overlay" id="nameModal">
+        <div class="modal-content">
+            <h2>Enter Guard Name</h2>
+            <input type="text" id="guardNameInput" placeholder="Guard Name..." />
+            <button id="saveGuardNameBtn">Save</button>
         </div>
     </div>
 
     <!-- Reset Confirmation Modal -->
-    <div class="modal fade" id="resetConfirmationModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Reset Confirmation</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to reset the entire audit? This will clear all saved data.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" onclick="resetAudit()">Reset</button>
-                </div>
+    <div class="modal-overlay" id="resetModal">
+        <div class="modal-content">
+            <h2>Confirm Reset</h2>
+            <p>This will clear all saved data. Continue?</p>
+            <div class="modal-actions">
+                <button id="confirmResetBtn" class="danger">Yes</button>
+                <button id="cancelResetBtn">No</button>
             </div>
         </div>
     </div>
 
-    <div class="container">
-
-        <!-- Reset Button -->
-        <button class="btn btn-danger reset-button" data-bs-toggle="modal" data-bs-target="#resetConfirmationModal">Reset Audit</button>
-
-        <!-- Search Bar -->
-        <input type="text" id="search-bar" class="form-control" placeholder="Search keys by key tag or individual keysets...">
-
-        <!-- Progress Bar -->
-        <div class="progress" id="progress-container">
-            <div class="progress-bar" id="progress-bar" role="progressbar" style="width: 0%;">0%</div>
+    <!-- Help Modal -->
+    <div class="modal-overlay" id="helpModal">
+        <div class="modal-content help-content">
+            <h2>Help</h2>
+            <ol>
+                <li>Enter your name when prompted on first visit.</li>
+                <li>Use the search bar at the top to filter keys by tags or sets.</li>
+                <li>Click on Good, Missing, Damaged, or Other to set the status of each key.</li>
+                <li>If Other is selected, a notes textarea will appear. Enter details as needed.</li>
+                <li>Progress bar updates as you complete the audit.</li>
+                <li>Use the "Generate PDF Report" button to download a PDF summary of the audit.</li>
+                <li>Click "Reset Audit" to start over if needed. Confirm your action in the popup.</li>
+            </ol>
+            <button id="closeHelpBtn">Close</button>
         </div>
-
-        <!-- Dashboard Pills -->
-        <div class="dashboard-container">
-            <div class="dashboard-pill dashboard-good">
-                <i class="bi bi-check-circle me-2"></i><span>Good: <span id="count-good">0</span></span>
-            </div>
-            <div class="dashboard-pill dashboard-missing">
-                <i class="bi bi-x-circle me-2"></i><span>Missing: <span id="count-missing">0</span></span>
-            </div>
-            <div class="dashboard-pill dashboard-damaged">
-                <i class="bi bi-exclamation-triangle me-2"></i><span>Damaged: <span id="count-damaged">0</span></span>
-            </div>
-            <div class="dashboard-pill dashboard-other">
-                <i class="bi bi-question-circle me-2"></i><span>Other: <span id="count-other">0</span></span>
-            </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="mb-3 d-flex justify-content-between">
-            <div>
-                <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#helpModal">Help</button>
-            </div>
-            <div>
-                <button class="btn btn-success" id="generate-report">Generate PDF Report</button>
-            </div>
-        </div>
-
-        <!-- Keys (4 Key Sets Example) -->
-        <div id="key-sets"></div>
-
     </div>
 
-    <!-- Footer -->
-    <footer class="footer text-center">
-        &copy; 2023 Key Audit System
+    <header class="navbar">
+        <div class="navbar-left">
+            <span class="tooltip" data-tooltip="Building Name">
+                <h1 id="buildingName">The Gloucester on Yonge</h1>
+            </span>
+            <span class="tooltip" data-tooltip="Guard Name">
+                <h2 id="guardNameDisplay"></h2>
+            </span>
+            <span class="tooltip" data-tooltip="Date/Time">
+                <h3 id="currentDateTime"></h3>
+            </span>
+        </div>
+        <div class="navbar-right">
+            <input type="text" id="searchInput" placeholder="Search keys by key tag or individual keysets...">
+            <button id="helpBtn">Help</button>
+            <button id="resetBtn">Reset Audit</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Statistics and Controls -->
+        <div class="stats-container">
+            <div class="progress-bar-container">
+                <div class="progress-bar-text">
+                    <span id="progressPercentage">0%</span>
+                </div>
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-bar-fill" id="progressFill"></div>
+                </div>
+            </div>
+            <div class="pill-container">
+                <div class="pill good-pill">
+                    <i class="fas fa-check-circle"></i> Good: <span id="goodCount">0</span>
+                </div>
+                <div class="pill missing-pill">
+                    <i class="fas fa-times-circle"></i> Missing: <span id="missingCount">0</span>
+                </div>
+                <div class="pill damaged-pill">
+                    <i class="fas fa-exclamation-triangle"></i> Damaged: <span id="damagedCount">0</span>
+                </div>
+                <div class="pill other-pill">
+                    <i class="fas fa-question-circle"></i> Other: <span id="otherCount">0</span>
+                </div>
+            </div>
+            <button id="generatePDFBtn">Generate PDF Report</button>
+        </div>
+
+        <!-- Key Sets -->
+        <div class="key-set-container" id="keySetsContainer">
+            <!-- Key Sets are dynamically generated by JavaScript -->
+        </div>
+    </main>
+
+    <footer class="footer">
+        <span>© 2023 Key Audit System</span>
     </footer>
 
-    <script>
-        const buildingName = "The Gloucester on Yonge";
-
-        // Four key sets for demonstration
-        const keyData = [
-            {
-                name: "Cleaner #1",
-                keys: [
-                    "1 Common Area Key - AA",
-                    "1 FOB (8573)",
-                    "1 Garbage Cans Changeroom - W044",
-                    "1 Gym Tissue Dispenser Black Key"
-                ]
-            },
-            {
-                name: "Cleaner #2",
-                keys: [
-                    "1 Common Area Key - AA",
-                    "1 FOB (15399)",
-                    "1 Gym Tissue Dispenser Black Key",
-                    "1 Elevator Key - x4001"
-                ]
-            },
-            {
-                name: "Cleaner #3",
-                keys: [
-                    "8584- Contractor Master Access",
-                    "1 Tractor Key (KUBOTA)",
-                    "1 Salt Container Pad Lock - A389",
-                    "1 Common Area Key - AA"
-                ]
-            },
-            {
-                name: "Cleaner #4",
-                keys: [
-                    "1 Common Area Master - AA",
-                    "1 Master FOB - 13211",
-                    "Gym Tissue Dispenser Black Key",
-                    "Salt Container Pad Lock - A389"
-                ]
-            }
-        ];
-
-        let statusCounts = { good: 0, missing: 0, damaged: 0, other: 0, total: 0, totalKeys: 0 };
-
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!localStorage.getItem('guardName')) {
-                const modal = new bootstrap.Modal(document.getElementById('guardNameModal'), {
-                    backdrop: 'static',
-                    keyboard: false
-                });
-                modal.show();
-            } else {
-                document.getElementById('guard-name-display').textContent = localStorage.getItem('guardName');
-                document.getElementById('audit-date').textContent = new Date().toLocaleString();
-            }
-
-            generateKeySets();
-            loadAuditData();
-
-            document.getElementById('generate-report').addEventListener('click', generateReport);
-
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl)
-            });
-
-            // Search functionality
-            document.getElementById('search-bar').addEventListener('input', function () {
-                const query = this.value.toLowerCase();
-                filterKeys(query);
-            });
-        });
-
-        function saveGuardName() {
-            const guardName = document.getElementById('guard-name-input').value.trim();
-            if (guardName) {
-                localStorage.setItem('guardName', guardName);
-                document.getElementById('guard-name-display').textContent = guardName;
-                document.getElementById('audit-date').textContent = new Date().toLocaleString();
-                const modal = bootstrap.Modal.getInstance(document.getElementById('guardNameModal'));
-                modal.hide();
-            } else {
-                alert("Please enter your name.");
-            }
-        }
-
-        function generateKeySets() {
-            const keySetsDiv = document.getElementById('key-sets');
-            keySetsDiv.innerHTML = '';
-            statusCounts = { good: 0, missing: 0, damaged: 0, other: 0, total: 0, totalKeys: 0 };
-
-            keyData.forEach((set, setIndex) => {
-                const card = document.createElement('div');
-                card.className = 'card mb-3';
-
-                const cardHeader = document.createElement('div');
-                cardHeader.className = 'card-header';
-                cardHeader.innerHTML = `<strong>${set.name}</strong>`;
-                card.appendChild(cardHeader);
-
-                const table = document.createElement('table');
-                table.className = 'table table-bordered table-hover mb-0';
-
-                const thead = document.createElement('thead');
-                const hr = document.createElement('tr');
-                ['Key', 'Status', 'Checked At', 'Note'].forEach(h => {
-                    const th = document.createElement('th');
-                    th.textContent = h;
-                    hr.appendChild(th);
-                });
-                thead.appendChild(hr);
-                table.appendChild(thead);
-
-                const tbody = document.createElement('tbody');
-
-                set.keys.forEach((key, keyIndex) => {
-                    statusCounts.totalKeys++;
-                    const row = document.createElement('tr');
-                    row.id = `key-row-${setIndex}-${keyIndex}`;
-                    row.classList.add('table-unchecked');
-
-                    const keyCell = document.createElement('td');
-                    keyCell.textContent = key;
-                    row.appendChild(keyCell);
-
-                    // Status Buttons (pill-shaped)
-                    const statusCell = document.createElement('td');
-                    const statusContainer = document.createElement('div');
-                    statusContainer.className = 'd-flex';
-
-                    const statuses = [
-                        { value: 'Good', color: 'success', label: 'Good' },
-                        { value: 'Missing', color: 'danger', label: 'Missing' },
-                        { value: 'Damaged', color: 'warning', label: 'Damaged' },
-                        { value: 'Other', color: 'secondary', label: 'Other' }
-                    ];
-
-                    statuses.forEach(st => {
-                        const btn = document.createElement('button');
-                        btn.className = `btn btn-${st.color} btn-sm status-btn`;
-                        btn.textContent = st.label;
-                        btn.style.borderRadius = '50px';
-                        btn.onclick = () => setStatus(setIndex, keyIndex, st.value, row);
-                        statusContainer.appendChild(btn);
-                    });
-
-                    statusCell.appendChild(statusContainer);
-                    row.appendChild(statusCell);
-
-                    const timeCell = document.createElement('td');
-                    timeCell.id = `time${setIndex}_${keyIndex}`;
-                    row.appendChild(timeCell);
-
-                    const noteCell = document.createElement('td');
-                    const noteArea = document.createElement('textarea');
-                    noteArea.className = 'form-control note-field';
-                    noteArea.id = `note${setIndex}_${keyIndex}`;
-                    noteCell.appendChild(noteArea);
-                    row.appendChild(noteCell);
-
-                    tbody.appendChild(row);
-                });
-
-                table.appendChild(tbody);
-                card.appendChild(table);
-                keySetsDiv.appendChild(card);
-            });
-
-            updateStatusCounts();
-            updateProgressBar();
-            updateDashboard();
-        }
-
-        function setStatus(setIndex, keyIndex, status, row) {
-            const timeCell = document.getElementById(`time${setIndex}_${keyIndex}`);
-            timeCell.textContent = new Date().toLocaleString();
-
-            const noteArea = document.getElementById(`note${setIndex}_${keyIndex}`);
-            if (status === 'Other') noteArea.style.display = 'block';
-            else noteArea.style.display = 'none';
-
-            colorRowByStatus(row, status);
-            updateStatusCounts();
-            saveAuditData();
-        }
-
-        function colorRowByStatus(row, status) {
-            row.classList.remove('table-success', 'table-danger', 'table-warning', 'table-info', 'table-unchecked');
-            if (status === 'Good') row.classList.add('table-success');
-            else if (status === 'Missing') row.classList.add('table-danger');
-            else if (status === 'Damaged') row.classList.add('table-warning');
-            else if (status === 'Other') row.classList.add('table-info');
-            else row.classList.add('table-unchecked'); // No status chosen
-        }
-
-        function updateStatusCounts() {
-            statusCounts.good = 0;
-            statusCounts.missing = 0;
-            statusCounts.damaged = 0;
-            statusCounts.other = 0;
-            statusCounts.total = 0;
-
-            keyData.forEach((set, setIndex) => {
-                set.keys.forEach((key, keyIndex) => {
-                    const row = document.getElementById(`key-row-${setIndex}-${keyIndex}`);
-                    if (row.classList.contains('table-success')) { statusCounts.good++; statusCounts.total++; }
-                    else if (row.classList.contains('table-danger')) { statusCounts.missing++; statusCounts.total++; }
-                    else if (row.classList.contains('table-warning')) { statusCounts.damaged++; statusCounts.total++; }
-                    else if (row.classList.contains('table-info')) { statusCounts.other++; statusCounts.total++; }
-                });
-            });
-
-            updateProgressBar();
-            updateDashboard();
-        }
-
-        function updateProgressBar() {
-            const totalKeys = keyData.reduce((sum, set) => sum + set.keys.length, 0);
-            const progress = (statusCounts.total / totalKeys) * 100;
-            const pb = document.getElementById('progress-bar');
-            pb.style.width = progress + '%';
-            pb.textContent = Math.round(progress) + '%';
-        }
-
-        function updateDashboard() {
-            document.getElementById('count-good').textContent = statusCounts.good;
-            document.getElementById('count-missing').textContent = statusCounts.missing;
-            document.getElementById('count-damaged').textContent = statusCounts.damaged;
-            document.getElementById('count-other').textContent = statusCounts.other;
-        }
-
-        function saveAuditData() {
-            const auditData = {};
-            keyData.forEach((set, setIndex) => {
-                set.keys.forEach((key, keyIndex) => {
-                    const row = document.getElementById(`key-row-${setIndex}_${keyIndex}`);
-                    let status = '';
-                    if (row.classList.contains('table-success')) status = 'Good';
-                    else if (row.classList.contains('table-danger')) status = 'Missing';
-                    else if (row.classList.contains('table-warning')) status = 'Damaged';
-                    else if (row.classList.contains('table-info')) status = 'Other';
-
-                    if (status) {
-                        const noteField = document.getElementById(`note${setIndex}_${keyIndex}`);
-                        const timeCell = document.getElementById(`time${setIndex}_${keyIndex}`);
-                        auditData[`key${setIndex}_${keyIndex}`] = {
-                            status: status,
-                            note: noteField.value || '',
-                            time: timeCell.textContent || ''
-                        };
-                    }
-                });
-            });
-            localStorage.setItem('auditData', JSON.stringify(auditData));
-        }
-
-        function loadAuditData() {
-            const auditData = JSON.parse(localStorage.getItem('auditData'));
-            if (auditData) {
-                keyData.forEach((set, setIndex) => {
-                    set.keys.forEach((key, keyIndex) => {
-                        const data = auditData[`key${setIndex}_${keyIndex}`];
-                        if (data) {
-                            const row = document.getElementById(`key-row-${setIndex}_${keyIndex}`);
-                            const noteField = document.getElementById(`note${setIndex}_${keyIndex}`);
-                            const timeCell = document.getElementById(`time${setIndex}_${keyIndex}`);
-                            let status = data.status;
-                            timeCell.textContent = data.time;
-                            noteField.value = data.note;
-                            if (status === 'Other') {
-                                noteField.style.display = 'block';
-                            }
-                            colorRowByStatus(row, status);
-                        }
-                    });
-                });
-                updateStatusCounts();
-                updateProgressBar();
-                updateDashboard();
-            }
-        }
-
-        function generateReport() {
-            const guardName = localStorage.getItem('guardName') || 'Unknown Guard';
-            const date = new Date();
-            const auditID = `AUDIT-${date.getTime()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
-
-            const completedKeys = [];
-            const notCompletedKeys = [];
-            keyData.forEach((set, setIndex) => {
-                set.keys.forEach((key, keyIndex) => {
-                    const row = document.getElementById(`key-row-${setIndex}_${keyIndex}`);
-                    let status = '';
-                    if (row.classList.contains('table-success')) status = 'Good';
-                    else if (row.classList.contains('table-danger')) status = 'Missing';
-                    else if (row.classList.contains('table-warning')) status = 'Damaged';
-                    else if (row.classList.contains('table-info')) status = 'Other';
-                    else status = 'Not Checked';
-
-                    const noteField = document.getElementById(`note${setIndex}_${keyIndex}`);
-                    const timeCell = document.getElementById(`time${setIndex}_${keyIndex}`);
-
-                    const item = {
-                        keySet: set.name,
-                        key: key,
-                        status: status,
-                        timeChecked: timeCell.textContent || 'N/A',
-                        note: noteField.value || ''
-                    };
-
-                    if (status === 'Not Checked') notCompletedKeys.push(item);
-                    else completedKeys.push(item);
-                });
-            });
-
-            const reportData = [...completedKeys, ...notCompletedKeys];
-
-            const { jsPDF } = window.jspdf;
-            var doc = new jsPDF();
-
-            doc.setFontSize(16);
-            doc.text('Key Audit Report', 14, 20);
-            doc.setFontSize(12);
-            doc.text(`Building Name: ${buildingName}`, 14, 30);
-            doc.text(`Guard's Name: ${guardName}`, 14, 36);
-            doc.text(`Date: ${date.toLocaleDateString()} ${date.toLocaleTimeString()}`, 14, 42);
-            doc.text(`Audit ID: ${auditID}`, 14, 48);
-
-            doc.setTextColor(0, 0, 255);
-            doc.text('Summary:', 14, 58);
-            doc.setTextColor(0, 0, 0);
-            const totalKeys = keyData.reduce((sum, set) => sum + set.keys.length, 0);
-            let summaryY = 64;
-            doc.text(`Total Keys: ${totalKeys}`, 14, summaryY);
-            doc.text(`Keys Checked: ${statusCounts.total}`, 14, summaryY + 6);
-            doc.text(`Good: ${statusCounts.good}`, 14, summaryY + 12);
-            doc.text(`Missing: ${statusCounts.missing}`, 14, summaryY + 18);
-            doc.text(`Damaged: ${statusCounts.damaged}`, 14, summaryY + 24);
-            doc.text(`Other: ${statusCounts.other}`, 14, summaryY + 30);
-            summaryY += 40;
-
-            const tableData = reportData.map(item => [
-                item.keySet,
-                item.key,
-                item.status,
-                item.timeChecked,
-                item.note
-            ]);
-
-            doc.autoTable({
-                head: [['Key Set', 'Key', 'Status', 'Checked At', 'Note']],
-                body: tableData,
-                startY: summaryY,
-                styles: {
-                    fontSize: 10,
-                    cellPadding: 2,
-                    halign: 'left',
-                    valign: 'middle'
-                },
-                headStyles: {
-                    fillColor: [193, 229, 255], // light pastel blue
-                    textColor: 0,
-                    fontStyle: 'bold'
-                },
-                alternateRowStyles: {
-                    fillColor: [240, 248, 255] // a very light pastel background
-                },
-                didParseCell: function (data) {
-                    if (data.column.dataKey === 2) {
-                        // Color status text in PDF
-                        if (data.cell.raw === 'Good') data.cell.styles.textColor = [40, 167, 69];
-                        else if (data.cell.raw === 'Missing') data.cell.styles.textColor = [220, 53, 69];
-                        else if (data.cell.raw === 'Damaged') data.cell.styles.textColor = [253, 126, 20];
-                        else if (data.cell.raw === 'Other') data.cell.styles.textColor = [111, 66, 193];
-                        else if (data.cell.raw === 'Not Checked') data.cell.styles.textColor = [108, 117, 125]; // gray for not checked
-                    }
-                }
-            });
-
-            doc.save(`Key_Audit_Report_${auditID}.pdf`);
-            alert('Report generated and downloaded successfully.');
-        }
-
-        function resetAudit() {
-            localStorage.removeItem('auditData');
-            localStorage.removeItem('guardName');
-            location.reload();
-        }
-
-        function filterKeys(query) {
-            keyData.forEach((set, setIndex) => {
-                const setCard = document.querySelector(`#key-sets > div:nth-child(${setIndex + 1})`);
-                let foundInSet = false;
-
-                set.keys.forEach((key, keyIndex) => {
-                    const keyRow = document.getElementById(`key-row-${setIndex}-${keyIndex}`);
-                    const match = key.toLowerCase().includes(query) || set.name.toLowerCase().includes(query);
-
-                    if (match) {
-                        keyRow.style.display = '';
-                        foundInSet = true;
-                    } else {
-                        keyRow.style.display = 'none';
-                    }
-                });
-
-                if (foundInSet || query === '') {
-                    setCard.style.display = '';
-                } else {
-                    setCard.style.display = 'none';
-                }
-            });
-        }
-    </script>
+    <script src="js/scripts.js"></script>
 </body>
-
 </html>
