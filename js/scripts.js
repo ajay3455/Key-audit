@@ -1,4 +1,4 @@
-// Updated Data Model with all listed keys
+// Complete Data Model including all sets and keys
 const initialData = {
     sets: [
         {
@@ -382,7 +382,7 @@ const initialData = {
         {
             setName: "P5 Sump Pump Cage Key",
             keys: [
-                { name: "Q1 - DIRAK (1333) This key is designated for the sump pump cage lock in the filtration room located near parking level 5017 and locker P5-5025-5030.", status: "", note: "", checkedAt: "" }
+                { name: "Q1 - DIRAK (1333) This key is designated for the sump pump cage lock in the filtration room near parking level 5017 and locker P5-5025-5030.", status: "", note: "", checkedAt: "" }
             ]
         },
         {
@@ -482,8 +482,7 @@ function loadData() {
     if (saved) {
         return JSON.parse(saved);
     } else {
-        const freshData = JSON.parse(JSON.stringify(initialData));
-        return freshData;
+        return JSON.parse(JSON.stringify(initialData));
     }
 }
 
