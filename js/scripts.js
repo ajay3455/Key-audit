@@ -1,5 +1,6 @@
-// Assumes initialData and all sets are defined as in previous solutions.
-// Only significant change is reordering columns in render and improved alignment.
+// Assuming initialData with all sets and keys is defined as before.
+// Example:
+// const initialData = { sets: [...], guardName: "", buildingName: "The Gloucester on Yonge", auditId: "", timestamp: "" };
 
 const guardNameDisplay = document.getElementById('guardNameDisplay');
 const buildingNameDisplay = document.getElementById('buildingName');
@@ -113,6 +114,7 @@ function renderAllKeySets() {
     guardNameDisplay.textContent = auditData.guardName || "";
     keySetsContainer.innerHTML = '';
 
+    // Column headers updated: 'Last Checked At' instead of 'Checked At'
     auditData.sets.forEach((set, setIndex) => {
         const setDiv = document.createElement('div');
         setDiv.classList.add('key-set');
@@ -125,12 +127,11 @@ function renderAllKeySets() {
         const table = document.createElement('table');
         table.classList.add('key-table');
 
-        // Changed column order here: Key | Checked At | Note | Status
         const thead = document.createElement('thead');
         thead.innerHTML = `
             <tr>
                 <th>Key</th>
-                <th>Checked At</th>
+                <th>Last Checked At</th>
                 <th>Note</th>
                 <th>Status</th>
             </tr>
@@ -152,7 +153,6 @@ function renderAllKeySets() {
             row.appendChild(checkedAtTd);
 
             const noteTd = document.createElement('td');
-            // Add note textarea if status is other
             if (keyObj.status === 'other') {
                 const textarea = document.createElement('textarea');
                 textarea.classList.add('notes-textarea');
@@ -163,7 +163,6 @@ function renderAllKeySets() {
                 });
                 noteTd.appendChild(textarea);
             } else {
-                // If not other, just show note text if any
                 if (keyObj.note) {
                     noteTd.textContent = keyObj.note;
                 }
@@ -206,7 +205,11 @@ function setKeyStatus(setIndex, keyIndex, status, row) {
         auditData.sets[setIndex].keys[keyIndex].note = "";
     }
 
-    // Update row
+    saveData();
+    // Update the UI instantly
+    const checkedAtTd = row.querySelector('td:nth-child(2)');
+    checkedAtTd.textContent = auditData.sets[setIndex].keys[keyIndex].checkedAt;
+
     const noteTd = row.querySelector('td:nth-child(3)');
     noteTd.innerHTML = '';
     if (status === 'other') {
@@ -223,7 +226,6 @@ function setKeyStatus(setIndex, keyIndex, status, row) {
     }
 
     applyStatusStyling(row, status);
-    saveData();
     updateCountsAndProgress();
 }
 
